@@ -1,0 +1,38 @@
+1. SELECT * FROM employees;
+2. SELECT COUNT(*) total FROM employees WHERE job_title = 'Manager';
+3. SELECT name, salary FROM employees WHERE department IN ('Sales', 'Marketing');
+4. SELECT AVG(salary) average_salary FROM employees WHERE joined_date >= NOW() - INTERVAL 5 YEAR
+5. SELECT employees.name, sales_data.sales FROM employees 
+JOIN sales_data ON sales_data.employee_id = employees.employee_id 
+ORDER BY sales_data.sales DESC 
+LIMIT 5
+
+6. SELECT employees.name, employees.salary, AVG(employees.salary) OVER (PARTITION BY employees.department) AS avg_salary_dept
+FROM employees
+WHERE employees.department IN (
+	SELECT department FROM employees GROUP BY department HAVING AVG(salary) > (SELECT AVG(salary) FROM employees)
+    );
+
+7. SELECT employees.name, sales_data.sales, RANK() OVER (ORDER BY sales_data.sales DESC) AS sales_rank
+FROM employees
+JOIN sales_data ON sales_data.employee_id = employees.employee_id 
+ORDER BY sales_data.sales DESC 
+LIMIT 5
+
+8. 
+- Stored Procedure:
+
+DELIMITER $$
+
+CREATE PROCEDURE getEmployeesByDepartment(departmentName VARCHAR(255))
+BEGIN
+  SELECT name, salary
+  FROM employees
+  WHERE department = departmentName COLLATE utf8mb4_unicode_ci;
+END $$
+
+DELIMITER ;
+
+- Call:
+
+CALL getEmployeesByDepartment('Sales');
